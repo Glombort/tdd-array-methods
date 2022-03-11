@@ -21,7 +21,7 @@
 // Refactor after test 3
 /* function map(array, fn) {
   for (let i = 0; i < array.length; i++) {
-    array[i] = fn(array[i],)
+    array[i] = fn(array[i])
   }
   return array;
 } */
@@ -35,13 +35,20 @@
 } */
 
 // Test 5
-function map(array, fn) {
+/* function map(array, fn) {
   for (let i = 0; i < array.length; i++) {
     array[i] = fn(array[i], i, array)
   }
   return array;
-}
+} */
 
+// Test 6
+function map(array, fn, thisArg) {
+  for (let i = 0; i < array.length; i++) {
+    array[i] = fn.bind(thisArg)(array[i], i, array)
+  }
+  return array;
+}
 // End of map()
 
 /* ------------------------------------------------ */
@@ -91,7 +98,7 @@ function map(array, fn) {
 } */
 
 // Test 10
-function filter(arr, fn) {
+/* function filter(arr, fn) {
   if (arr === undefined || fn === undefined) {
     return 'Error: filter() takes exactly two parameters'
   };
@@ -102,6 +109,24 @@ function filter(arr, fn) {
   for (let i = 0; i < arr.length; i++) {
     // JS's built-in .filter isn't strict? :)
     if (fn(arr[i], i, arr) == true) {
+      filteredArr.push(arr[i]);
+    }
+  }
+  return filteredArr;
+} */
+
+// Test 11
+function filter(arr, fn, thisArg) {
+  if (arr === undefined || fn === undefined) {
+    return 'Error: filter() takes exactly two parameters'
+  };
+  if (Array.isArray(arr) !== true) {
+    return 'Error: the first parameter passed to filter() must be an array'
+  }
+  filteredArr = []
+  for (let i = 0; i < arr.length; i++) {
+    // JS's built-in .filter isn't strict? :)
+    if (fn.bind(thisArg)(arr[i], i, arr) == true) {
       filteredArr.push(arr[i]);
     }
   }
@@ -289,7 +314,7 @@ function filter(arr, fn) {
 } */
 
 // Test 11
-function every(arr, fn) {
+/* function every(arr, fn) {
   if (arr === undefined || fn === undefined) {
     return "Error: every() takes exactly two parameters";
   }
@@ -298,6 +323,44 @@ function every(arr, fn) {
   }
   for (let i = 0; i < arr.length; i++) {
     if (fn(arr[i], i, arr) === false) {
+      return false;
+    }
+  }
+  return true;
+} */
+
+// Test 12
+/* function every(arr, fn) {
+  if (arr === undefined || fn === undefined) {
+    return "Error: every() takes exactly two parameters";
+  }
+  if (Array.isArray(arr) === false) {
+    return "Error: the first parameter passed to every() must be an array";
+  }
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === undefined) {
+      continue
+    }
+    if (fn(arr[i], i, arr) === false) {
+      return false;
+    }
+  }
+  return true;
+} */
+
+// Test 13
+function every(arr, fn, thisArg) {
+  if (arr === undefined || fn === undefined) {
+    return "Error: every() takes exactly two parameters";
+  }
+  if (Array.isArray(arr) === false) {
+    return "Error: the first parameter passed to every() must be an array";
+  }
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === undefined) {
+      continue
+    }
+    if (fn.bind(thisArg)(arr[i], i, arr) === false) {
       return false;
     }
   }
@@ -448,9 +511,18 @@ function some(arr, fn, thisArg) {
 } */
 
 // Test 7
-function find(arr, fn) {
+/* function find(arr, fn) {
   for (let i = 0; i < arr.length; i++) {
     if (fn(arr[i], i, arr) === true) {
+      return arr[i];
+    }
+  }
+} */
+
+// Test 8
+function find(arr, fn, thisArg) {
+  for (let i = 0; i < arr.length; i++) {
+    if (fn.bind(thisArg)(arr[i], i, arr) === true) {
       return arr[i];
     }
   }
@@ -678,6 +750,30 @@ function find(arr, fn) {
 }; */
 
 // Cleaning up for complete
+/* function reduce(arr, fn, initialValue) {
+  if(typeof fn !== 'function') {return 'Error: no callback function provided';};
+  if (arr.length > 0) {
+
+    let previousValue = arr[0];
+    let startValue = 1;
+
+    if (initialValue !== undefined) {
+      startValue = 0;
+      previousValue = initialValue;
+    }
+    for (let i = startValue; i < arr.length; i++) {
+      let currentValue = arr[i];
+      let currentIndex = i
+      let array = arr
+      previousValue = fn(previousValue, currentValue, currentIndex, array);
+    }
+
+    return previousValue;
+  }
+  return 'Error: array contains no elements, and initialValue is not provided';
+}; */
+
+// Test 11:
 function reduce(arr, fn, initialValue) {
   if(typeof fn !== 'function') {return 'Error: no callback function provided';};
   if (arr.length > 0) {
@@ -690,6 +786,9 @@ function reduce(arr, fn, initialValue) {
       previousValue = initialValue;
     }
     for (let i = startValue; i < arr.length; i++) {
+      if(arr[i] === undefined) {
+        continue
+      }
       let currentValue = arr[i];
       let currentIndex = i
       let array = arr

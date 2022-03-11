@@ -25,16 +25,8 @@ test("Test 3: map() should transform each element of a non-unitary array using t
   equal(result[1], expected[1]);
 });
 
-// Test 4
-test("Test 3: map() should transform each element of a non-unitary array using the fn argument", () => {
-  const result = map([1, 2], (x) => x + 1);
-  const expected = [2, 3];
-  equal(result[0], expected[0]);
-  equal(result[1], expected[1]);
-});
-
-// Test 5:
-test("Test 5: map()'s callback function should take an index parameter", () => {
+// Test 4:
+test("Test 4: map()'s callback function should take an index parameter", () => {
   const actual = map([1, 2, 3], (element, index) => { return element + index; });
   const expected = [1,3,5];
   equal(actual[0], expected[0]);
@@ -42,8 +34,8 @@ test("Test 5: map()'s callback function should take an index parameter", () => {
   equal(actual[2], expected[2]);
 });
 
-// Test 6:
-test("Test 6: map()'s callback function should also take the array itself as a parameter", () => {
+// Test 5:
+test("Test 5: map()'s callback function should also take the array itself as a parameter", () => {
   const actual = map([1,2,3], (element, index, array) => {
     if (array) {
       return element + array.length;
@@ -55,7 +47,21 @@ test("Test 6: map()'s callback function should also take the array itself as a p
   equal(actual[2], expected[2]);
 });
 
+// Test 6:
+test("Test 6: map() can also take thisArg to use in the callback function as this.", () => {
+  const foo = {someValue: 1};
+  function unboundMap(x) {
+    return x + this.someValue;
+  }
+  const actual = map([1,2], unboundMap, foo);
+  const expected = [2,3]
+  equal(actual[0], expected[0]);
+  equal(actual[1], expected[1]);
+});
+
 console.groupEnd();
+
+
 // End of map()
 
 /* ------------------------------------------------ */
@@ -144,6 +150,17 @@ test("Test 10: filter()'s callback function should also take the array itself as
   equal(actual[0], expected[0]);
 });
 
+// Test 11:
+test("Test 11: filter() can take thisArg to use as this. in the callback", () => {
+  const foo = {someValue: 1};
+  function unboundFilter(x) {
+    return x === this.someValue;
+  }
+  const actual = filter([1,2], unboundFilter, foo);
+  const expected = [1];
+  equal(actual[0], expected[0]);
+  equal(actual.length, expected.length);
+});
 
 console.groupEnd();
 // End of filter
@@ -233,6 +250,24 @@ test("Test 11: every()'s callback function should also take the array itself as 
   });
   const expected = false;
   equal(actual, expected);
+});
+
+// Test 12:
+test("Test 12: every() does not execute the callback function for empty elements", () => {
+  const actual = every([1,,2], (x) => x < 3);
+  const expected = true;
+  equal(actual, expected)
+});
+
+// Test 13:
+test("Test 13: every() should take thisArg in the callback function", () => {
+  const foo = {someValue: 3};
+  function unboundEvery(x) {
+    return x < this.someValue;
+  }
+  const actual = every([1,2], unboundEvery, foo);
+  const expected = true;
+  equal(actual, expected)
 });
 
 console.groupEnd();
@@ -368,11 +403,21 @@ test("Test 7: find()'s callback function should also take the array itself as a 
   equal(actual, expected);
 });
 
+// Test 8:
+test("Test 8: find() can take thisArg to use in the callback function as this.", () => {
+  const foo = {someValue: 1};
+  function unboundFind(x) {
+    return x > this.someValue;
+  }
+  const actual = find([1, 2], unboundFind, foo);
+  const expected = 2;
+  equal(actual, expected);
+});
+
 console.groupEnd();
 // End of find()
 
 /* ------------------------------------------------ */
-
 // reduce()
 console.groupCollapsed("reduce()");
 
@@ -470,6 +515,13 @@ test("Test 10a: reduce()'s callback function should also take the array itself a
   equal(actual, expected);
 });
 
+// Test 11:
+test("Test 11: reduce does not execute the callback function for empty array elements", () => {
+  const actual = reduce([1,,2],(x, y) => {return y - x}, 2);
+  const expected = 3;
+  equal(actual, expected);
+});
+
 console.groupEnd();
 // End of reduce()
 
@@ -477,7 +529,7 @@ console.groupEnd();
 /* ------------------------------------------------ */
 
 // flat()
-console.group/*Collapsed*/("flat()");
+console.groupCollapsed("flat()");
 
 // Test 1:
 test("Test 1: flat() should return an array", () => {
